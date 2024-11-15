@@ -14,7 +14,7 @@ projects:
 components:
 - name: dev-tools
   container:
-    image: quay.io/cgruver0/che/cypress-in-dev-spaces:latest
+    image: quay.io/cgruver0/che/cypress-in-devspaces:latest
     memoryRequest: 1Gi
     memoryLimit: 6Gi
     cpuRequest: 100m
