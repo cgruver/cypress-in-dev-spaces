@@ -1,0 +1,37 @@
+FROM registry.access.redhat.com/ubi9:latest
+
+USER 0
+
+ARG NODE_VERSION="v20.17.0"
+ARG USER_HOME_DIR="/home/user"
+ARG WORK_DIR="/projects"
+ARG TEMP_DIR="/tmpdir"
+
+ENV HOME=${USER_HOME_DIR}
+ENV PATH=${PATH}:/usr/local/node/bin
+
+COPY ./chrome.repo /etc/yum.repos.d/chrome.repo
+COPY ./entrypoint.sh /entrypoint.sh
+COPY ./chrome-utils.sh /usr/local/bin/chrome-utils.sh
+
+RUN dnf install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-9.noarch.rpm ; \
+    dnf install -y --allowerasing tigervnc-server-minimal novnc google-chrome-stable alsa-firmware alsa-lib alsa-tools-firmware podman procps-ng openssl hostname curl tar which shadow-utils bash zsh wget jq python3-pip python3-devel podman xz zip gzip unzip procps-ng ; \
+    dnf update -y ; \
+    dnf clean all ; \
+    mkdir -p ${USER_HOME_DIR} ; \
+    mkdir -p ${WORK_DIR} ; \
+    chgrp -R 0 /home ; \
+    chmod +x /entrypoint.sh ; \
+    chmod +x /usr/local/bin/chrome-utils.sh ; \
+    mkdir -p ${TEMP_DIR} ; \
+    curl -fsSL -o ${TEMP_DIR}/node.tz https://nodejs.org/dist/${NODE_VERSION}/node-${NODE_VERSION}-linux-x64.tar.xz ; \
+    tar -x --no-auto-compress -f ${TEMP_DIR}/node.tz -C ${TEMP_DIR} ; \
+    mv ${TEMP_DIR}/node-${NODE_VERSION}-linux-x64 /usr/local/node ; \
+    rm -rf "${TEMP_DIR}" ; \
+    ln -s /projects/bin/oc /usr/local/bin/oc ; \
+    ln -s /projects/bin/kubectl /usr/local/bin/kubectl ; \
+    chmod -R g=u /etc/passwd /etc/group /home ${WORK_DIR}
+
+WORKDIR ${WORK_DIR}
+ENTRYPOINT ["/usr/libexec/podman/catatonit","--","/entrypoint.sh"]
+CMD [ "tail", "-f", "/dev/null" ]

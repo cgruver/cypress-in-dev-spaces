@@ -1,0 +1,77 @@
+schemaVersion: 2.2.0
+attributes:
+  controller.devfile.io/storage-type: per-workspace
+metadata:
+  name: cypress-in-dev-spaces
+projects:
+  - name: cypress
+    git:
+      remotes:
+        origin: https://github.com/cypress-io/cypress-example-kitchensink
+      checkoutFrom:
+        remote: origin
+        revision: master
+components:
+- name: dev-tools
+  container:
+    image: quay.io/cgruver0/che/cypress-in-dev-spaces:latest
+    memoryRequest: 1Gi
+    memoryLimit: 6Gi
+    cpuRequest: 100m
+    cpuLimit: 1000m
+    mountSources: true
+    env:
+    - name: SHELL
+      value: "/bin/zsh"
+    - name: HOME
+      value: "/projects/home"
+    - name: VSCODE_DEFAULT_WORKSPACE
+      value: "/projects/cypress-in-dev-spaces/cypress-in-dev-spaces.code-workspace"
+    endpoints:
+      - exposure: public
+        name: tiger-vnc
+        protocol: https
+        targetPort: 6080
+      - exposure: none
+        name: vnc
+        targetPort: 5900
+- volume:
+    size: 20Gi
+  name: projects
+- name: prep-workspace
+  container:
+    args:
+      - '-c'
+      - >-
+        mkdir -p /projects/bin && cp /usr/bin/oc /projects/bin/oc && cp /usr/bin/kubectl /projects/bin/kubectl && if [[ -f ${HOME}/.kube/config ]]; then rm ${HOME}/.kube/config; fi
+    command:
+      - /bin/bash
+    image: image-registry.openshift-image-registry.svc:5000/openshift/cli:latest
+    mountSources: true
+    sourceMapping: /projects
+    memoryRequest: 128Mi
+    memoryLimit: 256Mi
+    cpuRequest: 10m
+    cpuLimit: 200m
+    env:
+    - name: HOME
+      value: "/projects/home"
+commands:
+- apply:
+    component: prep-workspace
+    label: Copy OpenShift CLI
+  id: prep-workspace
+- exec:
+    commandLine: chrome-utils.sh --start
+    component: dev-tools
+    label: Start Chrome
+  id: start-chrome
+- exec:
+    commandLine: chrome-utils.sh --passwd
+    component: dev-tools
+    label: Get VNC Password
+  id: vnc-passwd
+events:
+  preStart:
+    - prep-workspace
+
