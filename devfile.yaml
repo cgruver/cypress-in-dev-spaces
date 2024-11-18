@@ -39,6 +39,10 @@ components:
         name: tiger-vnc
         protocol: https
         targetPort: 6080
+      - exposure: public
+        name: cypress
+        protocol: https
+        targetPort: 8080
       - exposure: none
         name: vnc
         targetPort: 5900
