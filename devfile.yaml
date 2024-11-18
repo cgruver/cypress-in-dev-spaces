@@ -20,6 +20,11 @@ projects:
         revision: master
 components:
 - name: dev-tools
+  attributes:
+    pod-overrides:
+      metadata:
+        annotations:
+          io.kubernetes.cri-o.Devices: "/dev/fuse"
   container:
     image: quay.io/cgruver0/che/cypress-in-devspaces:latest
     memoryRequest: 1Gi
