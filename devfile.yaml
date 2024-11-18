@@ -4,6 +4,13 @@ attributes:
 metadata:
   name: cypress-in-dev-spaces
 projects:
+  - name: cypress-in-dev-spaces
+    git:
+      remotes:
+        origin: https://github.com/cgruver/cypress-in-dev-spaces.git
+      checkoutFrom:
+        remote: origin
+        revision: main
   - name: cypress
     git:
       remotes:

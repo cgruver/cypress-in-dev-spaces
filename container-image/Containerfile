@@ -15,7 +15,7 @@ COPY ./entrypoint.sh /entrypoint.sh
 COPY ./chrome-utils.sh /usr/local/bin/chrome-utils.sh
 
 RUN dnf install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-9.noarch.rpm ; \
-    dnf install -y --allowerasing tigervnc-server-minimal novnc google-chrome-stable alsa-firmware alsa-lib alsa-tools-firmware podman procps-ng openssl hostname curl tar which shadow-utils bash zsh wget jq python3-pip python3-devel podman xz zip gzip unzip procps-ng ; \
+    dnf install -y --allowerasing tigervnc-server-minimal novnc google-chrome-stable alsa-firmware alsa-lib alsa-tools-firmware podman procps-ng openssl hostname git curl tar which shadow-utils bash zsh wget jq python3-pip python3-devel podman xz zip gzip unzip procps-ng ; \
     dnf update -y ; \
     dnf clean all ; \
     mkdir -p ${USER_HOME_DIR} ; \
