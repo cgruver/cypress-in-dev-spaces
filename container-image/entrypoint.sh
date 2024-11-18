@@ -14,6 +14,17 @@ then
   fi
 fi
 
+if [ ! -d "${HOME}/.config/containers" ]
+then
+  mkdir -p ${HOME}/.config/containers
+  (echo '[storage]';echo 'driver = "overlay"';echo 'graphroot = "/tmp/graphroot"';echo '[storage.options.overlay]';echo 'mount_program = "/usr/bin/fuse-overlayfs"') > ${HOME}/.config/containers/storage.conf
+fi
+
+USER=$(whoami)
+START_ID=$(( $(id -u)+1 ))
+echo "${USER}:${START_ID}:65535" > /etc/subuid
+echo "${USER}:${START_ID}:65535" > /etc/subgid
+
 if [ ! -f ${HOME}/.zshrc ]
 then
   (echo "HISTFILE=${HOME}/.zsh_history"; echo "HISTSIZE=1000"; echo "SAVEHIST=1000") > ${HOME}/.zshrc

@@ -30,7 +30,11 @@ RUN dnf install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-9.n
     rm -rf "${TEMP_DIR}" ; \
     ln -s /projects/bin/oc /usr/local/bin/oc ; \
     ln -s /projects/bin/kubectl /usr/local/bin/kubectl ; \
-    chmod -R g=u /etc/passwd /etc/group /home ${WORK_DIR}
+    mkdir -p "${HOME}"/.config/containers ; \
+    setcap cap_setuid+ep /usr/bin/newuidmap ; \
+    setcap cap_setgid+ep /usr/bin/newgidmap ; \
+    touch /etc/subgid /etc/subuid ; \
+    chmod -R g=u /etc/passwd /etc/group /etc/subuid /etc/subgid /home ${WORK_DIR}
 
 WORKDIR ${WORK_DIR}
 ENTRYPOINT ["/usr/libexec/podman/catatonit","--","/entrypoint.sh"]
